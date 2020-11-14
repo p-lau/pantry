@@ -1,0 +1,44 @@
+.form {
+    width: 100%;
+}
+
+.ingredients {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.ingredient {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.ingredient button {
+    width: 100%;
+}
+
+.ingredient legend {
+    max-width: inherit;
+    overflow-x: hidden;
+    text-overflow: fade;
+}
+
+.dropdown {
+    appearance: none;
+    min-height: 5rem;
+    max-height: 15rem;
+    overflow-y :auto;
+    text-overflow: ellipsis;
+    overflow-x:hidden;
+    position:absolute;
+    width: 5rem;
+    display: contents;
+}
+
+.array {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-flow: column wrap;
+}
