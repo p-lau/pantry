@@ -5,6 +5,7 @@ import PantryForm from "./form"
 import {Pantry} from "../../types/pantry"
 import {PantryContext} from "../../context"
 import {appFirestore} from "../../config"
+import {toast} from "react-toastify"
 
 const Add = () => {
     const { id } = React.useContext(PantryContext)
@@ -20,9 +21,12 @@ const Add = () => {
                     [`pantries.${newPantryRef.id}`]:
                         pantry.name
                     })
-                    .then(()=> push(`/`))
+                    .then(()=> {
+                        console.log(`Pantry update complete`)
+                        push(`/profile`)
+                    })
                 })
-            .catch(e => console.error(e))
+            .catch(e => toast.error(e))
     }
 
     if(!id){return <Redirect to={`/home`}/>}

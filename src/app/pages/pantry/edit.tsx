@@ -1,16 +1,18 @@
 import React from 'react'
 import {Helmet} from "react-helmet"
-import {useParams, Redirect} from 'react-router-dom'
+import {useParams, Redirect, useHistory} from 'react-router-dom'
 import {PantryContext} from "../../context"
 import {appFirestore} from "../../config"
 import PantryForm from "./form"
 import {Pantry} from "../../types/pantry"
 import {useDocumentDataOnce} from "react-firebase-hooks/firestore"
 import {Error, Loading} from "../"
+import {toast} from "react-toastify";
 
 const Edit = () => {
     const { id } = React.useContext(PantryContext)
     const { pantryId }: any = useParams()
+    const {push} = useHistory()
     const pantryRef = appFirestore.doc(`/pantries/${pantryId}`)
     const userRef = appFirestore.doc(`/users/${id}`)
     const [pantry, loading, error]: [Pantry | undefined, boolean, any] = useDocumentDataOnce(pantryRef)
@@ -26,8 +28,11 @@ const Edit = () => {
                 }
             })
         })
-            .then(()=>console.log(`Pantry update complete`))
-            .catch((e)=>console.error(e))
+            .then(()=> {
+                toast.success(`Pantry update complete`)
+                push(`/profile`)
+            })
+            .catch((e)=>toast.error(e))
     }
 
     // Checks if user can edit this pantry (as owner or shared user)
