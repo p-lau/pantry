@@ -1,6 +1,10 @@
 {
 	"short_name": "p-pantry",
-	"name": "A recipe-building, ingredient-storing app for your needs",
+	"name": "Pantry",
+	"description": "A recipe-building, ingredient-storing app for your needs",
+	"keywords": ["recipe", "saver"],
+	"contributors": ["Panhavuth Lau"],
+	"author": "Panhavuth Lau",
 	"icons": [
 		{
 			"src": "favicon.ico",
