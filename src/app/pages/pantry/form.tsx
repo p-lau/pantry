@@ -113,8 +113,8 @@ const PantryForm = ({handleSubmit, editing = newPantry}: PantryFormProps) => {
                         />
                     </label>
                     <IngredientFieldArray onEdit={() => setStatus( true)}/>
-                    <button className={'btn danger-btn'} type={'reset'}>Undo</button>
-                    <button className={'btn success-btn'} type={'submit'}>Save Pantry</button>
+                    <button className={'btn danger-btn'} type={'reset'} onClick={()=>setStatus(false)}>Undo</button>
+                    <button className={'btn success-btn'} type={'submit'} onClick={()=>setStatus(false)}>Save Pantry</button>
                 </Form>
             )}
         </Formik>
