@@ -14,7 +14,7 @@
     overflow: hidden;
 }
 
-.ingredient button {
+.ingredient > button {
     width: 100%;
 }
 

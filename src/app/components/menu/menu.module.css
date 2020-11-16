@@ -26,6 +26,7 @@
 }
 
 .item {
+    transition: ease-in-out 200ms;
     user-select: none;
     display: flex;
     height: 4rem;

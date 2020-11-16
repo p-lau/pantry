@@ -10,19 +10,21 @@ const Profile = React.lazy(()=> import('./profile'))
 
 const Error = ({e = "404", m = "Not Found"}: {e?: string, m?: string}) => {
     return(
-        <>
+        <section className={'error'}>
             <Helmet title={e}/>
             <h1 className={'dangerBlur'}>{e}</h1>
             <p>{m}</p>
-        </>
+        </section>
     )
 }
 
 const Loading = () => {
     return (
-        <div className={'content waitingBlur'} key={0}>
-            <Helmet title={'Loading...'}/>
-            <h1>Loading</h1>
+        <div className={'content waitingBlur'}>
+            <section className={'loading'}>
+                <Helmet title={'Loading...'}/>
+                <h1>Loading</h1>
+            </section>
         </div>
     )
 }
@@ -31,7 +33,7 @@ const Pages = () => {
     return(
         <main>
             <React.Suspense fallback={<Loading/>}>
-                <div className={'content'} key={1}>
+                <div className={'content'}>
                     <Switch>
                         <Route exact path={"/"} render={()=><Redirect to={'/home'}/>}/>
                         <Route path={"/home"} component={Home}/>

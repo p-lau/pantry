@@ -2,7 +2,7 @@ import React from 'react'
 import {Prompt, useHistory, useParams} from "react-router-dom"
 import { Helmet } from "react-helmet"
 import { Field, Form, Formik } from "formik"
-import { useDocumentOnce } from "react-firebase-hooks/firestore"
+import { useDocumentDataOnce } from "react-firebase-hooks/firestore"
 
 import styles from "./profile.module.css"
 import {appAuth, appFirestore, appStorage} from "../../config"
@@ -28,7 +28,7 @@ const Edit = () => {
     const AvatarRef = appStorage.ref(`profile/image`)
     const userRef = appFirestore.doc(`/users/${id}`)
     const [{fileError, uploading, newAvatar, file, fileExt}, setState] = React.useState<AvatarState>({uploading: false})
-    const [value, loading, err] = useDocumentOnce(userRef)
+    const [value, loading, err] = useDocumentDataOnce(userRef)
 
     const filePreview = (e: any) => {
         const file = e.target.files[0] as File
@@ -50,7 +50,7 @@ const Edit = () => {
     if(err){return <Error e={err.name} m={err.message}/>}
     if(loading){return <Loading/>}
     else {
-        const {name, status, avatar} = value.data() as User
+        const {name, status, avatar} = value as User
         return (
             <>
                 <Helmet title={"Profile"}/>
@@ -75,6 +75,9 @@ const Edit = () => {
                                 toast.error(e.message)
                             },
                             () => {
+                                fileRef.updateMetadata({ cacheControl: "public,max-age=86400"})
+                                    .then((metadata)=>{console.info(`Metadata uploaded: ${metadata}`)})
+                                    .catch((e)=>{console.error(`Metadata update failed: ${e}`)})
                                 toast.update(uploadId.current, {type: "success"})
                                 fileRef.getDownloadURL()
                                     .then((url: string) => {

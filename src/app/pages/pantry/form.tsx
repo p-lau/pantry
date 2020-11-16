@@ -26,8 +26,9 @@ const DatePickerField = (props: any) => {
             {...field}
             {...props}
             selected={formatDate(field.value)}
+            autoComplete={'off'}
             onChange={val => {
-                setFieldValue(field.name, val)
+                if(val)setFieldValue(field.name, val)
             }}
         />
     )
@@ -38,6 +39,20 @@ const IngredientFieldArray = ({onEdit}: any) => {
     return(
         <FieldArray name={`ingredients`} render={arrayHelpers => (
             <div className={styles.ingredients}>
+                <datalist id={`ingredient-types`}>
+                    {}
+                    <option value={"Fruit"}/>
+                    <option value={"Seed"}/>
+                    <option value={"Vegetable"}/>
+                    <option value={"Poultry"}/>
+                    <option value={"Beef"}/>
+                    <option value={"Pork"}/>
+                    <option value={"Fish"}/>
+                    <option value={"Shellfish"}/>
+                    <option value={"Oil"}/>
+                    <option value={"Sauce"}/>
+                    <option value={"Powder"}/>
+                </datalist>
                 <button className={'btn info-btn'} type={'button'} onClick={()=> {
                     arrayHelpers.push({name: '', expires: new Date()})
                     onEdit()
@@ -59,17 +74,13 @@ const IngredientFieldArray = ({onEdit}: any) => {
                             <FastField
                                 onBlur={()=>onEdit()}
                                 name={`ingredients[${index}].type`}
-                                as={'select'}
-                                className={`dropdown`}
+                                list={`ingredient-types`}
+                                type={'text'}
+                                autoComplete={'off'}
+                                placeholder={`Type of ingredient`}
                                 value={ingredient.type || ""}
                                 required
                             >
-                                <option value={""} disabled hidden>Type of Ingredient</option>
-                                <option value={"meat"}>Meat</option>
-                                <option value={"vegetable"}>Vegetable</option>
-                                <option value={"oil"}>Oil</option>
-                                <option value={"sauce"}>Sauce</option>
-                                <option value={"Powder"}>Powder</option>
                             </FastField>
                         </label>
                         <label>

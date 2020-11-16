@@ -54,13 +54,11 @@ registerRoute(
 );
 
 // An example runtime caching route for requests that aren't handled by the
-// precache, in this case same-origin .png requests like those from in public/
-registerRoute(
-  // Add in any other file extensions or routing criteria as needed.
-  ({ url }) => url.origin === self.location.origin && url.pathname.endsWith('.png'),
+// precache requests from in public/
+registerRoute(({ url }) => url.origin === self.location.origin,
   // Customize this strategy as needed, e.g., by changing to CacheFirst.
   new StaleWhileRevalidate({
-    cacheName: 'images',
+    cacheName: 'public',
     plugins: [
       // Ensure that once this runtime cache reaches a maximum size the
       // least-recently used images are removed.
@@ -89,11 +87,4 @@ registerRoute(
             new ExpirationPlugin({maxAgeSeconds: 60 * 60 * 24 * 365})
         ],
     })
-)
-
-// Cache firebase storage requests
-registerRoute(({url}) => url.origin === 'https://firebasestorage.googleapis.com/v0/b/p-pantry.appspot.com/',
-    new StaleWhileRevalidate(
-    {cacheName: 'firebase-storage', plugins:[new ExpirationPlugin({maxEntries: 50})]},
-    )
 )
