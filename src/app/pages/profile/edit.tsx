@@ -5,7 +5,6 @@ import { Field, Form, Formik } from "formik"
 import { useDocumentDataOnce } from "react-firebase-hooks/firestore"
 
 import styles from "./profile.module.css"
-import {appAuth, appFirestore, appStorage} from "../../config"
 import { PantryContext } from "../../context"
 import { Loading, Error} from "../"
 import { User } from "../../types/user"
@@ -20,13 +19,14 @@ type AvatarState = {
 }
 
 const Edit = () => {
-    const {id} = React.useContext(PantryContext)
-    const {user}: any = useParams()
+    const {user, firestore, auth, storage} = React.useContext(PantryContext)
+    const {userId}: any = useParams()
     const history = useHistory()
     const uploadId = React.useRef<any>(null)
-    if(user !== id){history.push(`/profile/${user}`)}
-    const AvatarRef = appStorage.ref(`profile/image`)
-    const userRef = appFirestore.doc(`/users/${id}`)
+
+    if(userId !== user?.uid){history.push(`/profile/${user}`)}
+    const AvatarRef = storage?.ref(`profile/image`)
+    const userRef = firestore?.doc(`/users/${user?.uid}`)
     const [{fileError, uploading, newAvatar, file, fileExt}, setState] = React.useState<AvatarState>({uploading: false})
     const [value, loading, err] = useDocumentDataOnce(userRef)
 
@@ -46,7 +46,7 @@ const Edit = () => {
         }
     }
 
-    if(!id){history.push('/profile/login')}
+    if(!user?.uid){history.push('/profile/login')}
     if(err){return <Error e={err.name} m={err.message}/>}
     if(loading){return <Loading/>}
     else {
@@ -57,8 +57,8 @@ const Edit = () => {
                 <Formik initialStatus={false} initialValues={{name, status}} onSubmit={({name, status}) => {
                     setState(prevState => ({...prevState, uploading: true}))
                     if(fileExt && newAvatar && file){
-                        const fileRef = AvatarRef.child(`${id}/avatar.${fileExt}`)
-                        fileRef.put(file).on('state_changed',
+                        const fileRef = AvatarRef?.child(`${user?.uid}/avatar.${fileExt}`)
+                        fileRef?.put(file).on('state_changed',
                             async ({bytesTransferred, totalBytes}) => {
                                 const progress = (bytesTransferred / totalBytes)
                                 if (uploadId.current === null) {
@@ -83,9 +83,9 @@ const Edit = () => {
                                     .then((url: string) => {
                                         toast.dismiss(uploadId.current)
                                         uploadId.current = null
-                                        userRef.update({name, status, avatar: url})
+                                        userRef?.update({name, status, avatar: url})
                                             .then(()=> {
-                                                appAuth.currentUser?.updateProfile({photoURL: url})
+                                                auth?.currentUser?.updateProfile({photoURL: url})
                                                 toast.success(`Profile Uploaded`, {toastId: 'profile'})
                                             })
                                             .then(()=> {
@@ -103,7 +103,7 @@ const Edit = () => {
 
                             })
                     } else {
-                        userRef.update({name, status})
+                        userRef?.update({name, status})
                             .then(()=> {
                                 toast.success(`Profile Uploaded`, {toastId: 'profile'})
                                 setState(prevState => ({...prevState, uploading: false}))

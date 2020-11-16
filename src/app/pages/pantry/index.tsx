@@ -6,10 +6,10 @@ const Edit = React.lazy(() => import('./edit'))
 const Add = React.lazy(()=> import('./add'))
 
 const Pantry = () => {
-    const {id} = React.useContext(PantryContext)
+    const {user} = React.useContext(PantryContext)
     const {path} = useRouteMatch()
 
-    if(!id){return <Redirect to={`/home`}/>}
+    if(!user?.uid){return <Redirect to={`/home`}/>}
     return (
         <Switch>
             <Route exact path={path} render={() => <Redirect to={`${path}/add`}/>}/>

@@ -5,7 +5,12 @@
 	"keywords": ["recipe", "saver", "pantry"],
 	"contributors": ["Panhavuth Lau"],
 	"author": "Panhavuth Lau",
+	"lang": "en-US",
 	"icons": [
+		{
+			"src": "assets/icons/apple-touch-icon.png",
+			"sizes":"180x180","purpose":"maskable", "type":"image/png"
+		},
 		{
 			"src":"assets/icons/android-chrome-192x192.png",
 			"sizes":"192x192","type":"image/png"
@@ -13,14 +18,17 @@
 		{
 			"src":"assets/icons/android-chrome-512x512.png",
 			"sizes":"512x512","type":"image/png"
+		},
+		{
+			"src": "assets/icons/safari-pinned-tab.svg",
+			"sizes":"512x512","purpose":"monochrome", "type":"image/svg"
 		}
 	],
-	"scope": ".",
 	"shortcuts": [
 
 	],
 	"start_url": ".",
 	"display": "standalone",
-	"theme_color": "#04081f",
-	"background_color": "#04081f"
+	"theme_color": "#F48C06",
+	"background_color": "#04081F"
 }

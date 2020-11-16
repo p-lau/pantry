@@ -1,31 +1,35 @@
-import React, {useContext} from 'react'
+import React from 'react'
 import {Redirect} from 'react-router-dom'
 import {Helmet} from "react-helmet"
 import {PantryContext} from "../../context"
 import styles from "./profile.module.css"
-import {ReactComponent as Logo} from "../../assets/icons/google-color.svg";
+import {ReactComponent as Logo} from "../../assets/icons/google-color.svg"
 import {Field, Form, Formik} from "formik"
-import {appAuth, googleProvider, appFirestore} from "../../config"
 import {toast} from "react-toastify"
 
 export const GoogleLogin = () => {
+    const {auth, firestore, google} = React.useContext(PantryContext)
+    console.log(auth)
+
     return (
         <button className={styles.google + " btn"} onClick={event => {
             event.preventDefault()
-            appAuth.signInWithPopup(googleProvider)
-                .then(({user, additionalUserInfo}) => {
-                    // if new user, create userdata
-                    const id = user?.uid
-                    const isNew = additionalUserInfo?.isNewUser
-                    if(isNew){appFirestore.doc(`/users/${id}`).set({
-                        subscribedPantries: [],
-                        subscribedRecipes: [],
-                        name: user?.displayName || "Pantry User",
-                        avatar: user?.photoURL,
-                        status: "New"
-                    }).then(()=> toast.success('Welcome to pantry!'))}
-                })
-                .catch( error => {toast.error(error.message)})
+            if(google && auth){
+                auth.signInWithPopup(google)
+                    .then(({user, additionalUserInfo}) => {
+                        // if new user, create userdata
+                        const id = user?.uid
+                        const isNew = additionalUserInfo?.isNewUser
+                        if(isNew){firestore?.doc(`/users/${id}`).set({
+                            subscribedPantries: [],
+                            subscribedRecipes: [],
+                            name: user?.displayName || "Pantry User",
+                            avatar: user?.photoURL,
+                            status: "New"
+                        }).then(()=> toast.success('Welcome to pantry!'))}
+                    })
+                    .catch( error => {toast.error(error.message)})
+            }
         }}>
             <Logo/>
             Google
@@ -34,16 +38,16 @@ export const GoogleLogin = () => {
 }
 
 const Login = () => {
-    const {id} = useContext(PantryContext)
+    const {user, auth} = React.useContext(PantryContext)
     const [error, setError] = React.useState("")
-    if(id){return <Redirect to={'/home'}/>}
+    if(user?.uid){return <Redirect to={'/home'}/>}
 
     return (
         <>
             <Helmet title={"Login"}/>
             <div className={styles.login}>
                 <Formik initialValues={{email:'', password:''}} onSubmit={({email, password})=>{
-                    appAuth.signInWithEmailAndPassword(email, password)
+                    auth?.signInWithEmailAndPassword(email, password)
                         .catch(e => {setError(e.message)})
                 }}>
                     <Form>

@@ -4,20 +4,19 @@ import {Redirect, useHistory} from 'react-router-dom'
 import PantryForm from "./form"
 import {Pantry} from "../../types/pantry"
 import {PantryContext} from "../../context"
-import {appFirestore} from "../../config"
 import {toast} from "react-toastify"
 
 const Add = () => {
-    const { id } = React.useContext(PantryContext)
+    const { user, firestore } = React.useContext(PantryContext)
     const {push} = useHistory()
-    const pantriesRef = appFirestore.collection(`/pantries`)
-    const userRef = appFirestore.doc(`/users/${id}`)
+    const pantriesRef = firestore?.collection(`/pantries`)
+    const userRef = firestore?.doc(`/users/${user?.uid}`)
 
     const handleSubmit = (pantry: Partial<Pantry>) => {
         console.log(pantry)
-        pantriesRef.add({...pantry, owner: id})
+        pantriesRef?.add({...pantry, owner: user?.uid})
             .then(newPantryRef => {
-                userRef.update({
+                userRef?.update({
                     [`pantries.${newPantryRef.id}`]:
                         pantry.name
                     })
@@ -29,7 +28,7 @@ const Add = () => {
             .catch(e => toast.error(e))
     }
 
-    if(!id){return <Redirect to={`/home`}/>}
+    if(!user?.uid){return <Redirect to={`/home`}/>}
 
     return (
         <>

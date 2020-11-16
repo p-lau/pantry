@@ -4,7 +4,7 @@ import {Helmet} from "react-helmet"
 import {PantryContext} from "../../context"
 
 const Home = () => {
-    const {id} = useContext(PantryContext)
+    const {user} = useContext(PantryContext)
 
     return (
         <>
@@ -14,7 +14,7 @@ const Home = () => {
             <p>If you suffer from organization with or without another person in the household over food storage, this
                 is the app for you.</p>
             <p>List your food here with an expiration date, and we can notify you before the time runs out.</p>
-            {!id && <Link to={'/profile/login'}>Click here to sign in</Link>}
+            {!user?.uid && <Link to={'/profile/login'}>Click here to sign in</Link>}
         </>
     );
 }

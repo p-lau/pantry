@@ -24,6 +24,7 @@
     "build-n-serve": "react-scripts build && serve -s build"
   },
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.1",
     "source-map-explorer": "^2.5.0",
     "react-scripts": "4.0.0",
     "@types/css-modules": "^1.0.1",

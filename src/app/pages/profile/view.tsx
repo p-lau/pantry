@@ -4,16 +4,15 @@ import {Helmet} from 'react-helmet'
 import {Link, useParams} from 'react-router-dom'
 
 import {PantryContext} from '../../context'
-import {appAuth, appFirestore} from '../../config'
 import {Error, Loading} from '../index'
 import styles from "./profile.module.css"
 import {User} from "../../types/user";
 
 
 const View = () => {
-    const {id} = React.useContext(PantryContext)
-    const {user} = useParams<{ user:string }>()
-    const [value, loading, error] = useDocumentDataOnce(appFirestore.doc(`/users/${user}`))
+    const { user, auth, firestore } = React.useContext(PantryContext)
+    const {userId} = useParams<{ userId:string }>()
+    const [value, loading, error] = useDocumentDataOnce(firestore?.doc(`/users/${userId}`))
 
 
     if(loading){return(
@@ -45,11 +44,11 @@ const View = () => {
                         </Link>) : null}
                 </ul>
             </section>
-            {user === id &&
+            {userId === user?.uid &&
             <section>
                 <Link
                     title={'Edit your profile'}
-                    to={`/profile/${user}/edit`}
+                    to={`/profile/${userId}/edit`}
                     children={<button className={'btn info-btn'}>Edit Profile</button>}
                 />
                 <Link to={`/home`}
@@ -57,7 +56,7 @@ const View = () => {
                       children={
                           <button
                               className={'btn danger-btn'}
-                              onClick={()=>{appAuth.signOut().catch(e => console.log(e))}}
+                              onClick={()=>{auth?.signOut().catch(e => console.log(e))}}
                               children={'Sign out'}
                           />}
                 />

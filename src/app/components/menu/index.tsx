@@ -8,15 +8,14 @@ import {ReactComponent as Home} from "../../assets/icons/home.svg"
 import {ReactComponent as Explore} from "../../assets/icons/search.svg"
 import {ReactComponent as Recipe} from "../../assets/icons/recipe.svg"
 import {ReactComponent as Pantry} from "../../assets/icons/pantry.svg"
-import {appAuth} from "../../config";
 
 const Menu = () => {
     const history = useHistory()
     const location = useLocation()
-    const {theme, id} = React.useContext(PantryContext)
-    const photoURL = appAuth.currentUser?.photoURL
+    const {theme, user, auth} = React.useContext(PantryContext)
+    const photoURL = auth?.currentUser?.photoURL
     const paths = [
-        {location: "/profile", name: id ? "Profile" : "Login", src: <Profile/>, photoURL},
+        {location: "/profile", name: user?.uid ? "Profile" : "Login", src: <Profile/>, photoURL},
         {location: "/home", name: "Home", src: <Home/>},
         {location: "/explore", name: "Explore", src: <Explore/>},
     ]
@@ -27,10 +26,10 @@ const Menu = () => {
     ]
 
     return (
-            <header id={`header`} className={styles.header} style={{backgroundColor: `#002`}}>
+            <header id={`header`} className={styles.header} style={{backgroundColor: theme.slice(-1)[0]}}>
                 <nav className={styles.nav}>
                     <ul className={styles.ul}>
-                        {(id ? authPaths : paths).map((path, index) => (
+                        {(user?.uid ? authPaths : paths).map((path, index) => (
                             <li key={index} style={{backgroundColor: theme[index]}}>
                                 <Item
                                     path={path}
