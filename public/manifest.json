@@ -24,9 +24,6 @@
 			"sizes":"512x512","purpose":"monochrome", "type":"image/svg"
 		}
 	],
-	"shortcuts": [
-
-	],
 	"start_url": ".",
 	"display": "standalone",
 	"theme_color": "#F48C06",

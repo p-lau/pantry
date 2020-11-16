@@ -64,6 +64,7 @@ registerRoute(({ url }) => url.origin === self.location.origin,
 			// least-recently used images are removed.
 			new ExpirationPlugin({ maxAgeSeconds: 60 * 60 * 24 * 365 }),
 		],
+		fetchOptions: {mode: "same-origin"}
 	})
 )
 
@@ -76,3 +77,16 @@ self.addEventListener('message', (event) => {
 });
 
 // Any other custom service worker logic can go here.
+
+registerRoute(({ url }) => url.origin === 'https://firebasestorage.googleapis.com/',
+	// Customize this strategy as needed, e.g., by changing to CacheFirst.
+	new StaleWhileRevalidate({
+		cacheName: 'firebase-origin',
+		plugins: [
+			// Ensure that once this runtime cache reaches a maximum size the
+			// least-recently used images are removed.
+			new ExpirationPlugin({ maxAgeSeconds: 60 * 60 * 24 }),
+		],
+		fetchOptions: {mode: "cors"}
+	})
+)
