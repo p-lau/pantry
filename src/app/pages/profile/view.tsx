@@ -14,7 +14,6 @@ const View = () => {
     const {userId} = useParams<{ userId:string }>()
     const [value, loading, error] = useDocumentDataOnce(firestore?.doc(`/users/${userId}`))
 
-
     if(loading){return(
         <>
             <Loading/>
@@ -25,7 +24,7 @@ const View = () => {
             <Error e={error?.name} m={error?.message || "User not found."}/>
         </>
     )} else {
-        const {avatar, status, name, pantries} = value as User
+        const {status, name, pantries, avatar} = value as User
         return(
         <>
             <Helmet title={`${name}'s Profile`}/>
@@ -37,11 +36,11 @@ const View = () => {
             </section>
             <section id={'pantries'}>
                 <h2>Pantries</h2>
-                <ul>
+                <ul className={styles.pantries}>
                     { pantries ? Object.entries(pantries).map(([id, name]) =>
-                        <Link to={`/pantry/${id}/edit`} key={id}>
-                            <li>{name}</li>
-                        </Link>) : null}
+                        <li key={id}>
+                            <Link to={`/pantry/${id}/edit`}>{name}</Link>
+                        </li>) : null}
                 </ul>
             </section>
             {userId === user?.uid &&

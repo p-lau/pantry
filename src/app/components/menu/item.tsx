@@ -24,7 +24,7 @@ export const Item = ({GoTo, isSelected, path}: ItemProps) => {
                 GoTo()
                }
         }}
-              style={{backgroundColor: isSelected ? "#fff" : ""}}>
+              style={isSelected ? {backgroundColor : "#fff"} : undefined}>
             {isSelected ?
                 <>{path.src}</> :
                 path.photoURL ?

@@ -1,20 +1,22 @@
 export type User = {
+    avatar: string
+    username?: string
     name: string
     email?: string
-    avatar?: string
-    privacy: number
+    privacy?: number
     bio?: string
     status?: string
     friends?: Friend[]
     recipes?: string[]
     subscribedRecipes?: string[]
     pantries?: {
-        [id: string]: string,
+        [id: string]: string
     }
     subscribedPantries?: string[]
 }
 
 export type Friend = {
-    id: string,
-
+    id: string
+    name: string
+    avatar: string
 }

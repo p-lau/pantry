@@ -2,13 +2,13 @@ import React from 'react'
 import Menu from './components/menu'
 import Pages from './pages'
 import PantryApp from "./context"
-import {toast, Zoom} from "react-toastify"
+import {toast} from "react-toastify"
 
 toast.configure({
+    limit: 1,
     position: "bottom-right",
     closeButton: false,
     draggable: false,
-    transition: Zoom
 })
 
 const App = () => {

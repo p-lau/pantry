@@ -18,7 +18,10 @@ const Add = () => {
             .then(newPantryRef => {
                 userRef?.update({
                     [`pantries.${newPantryRef.id}`]:
-                        pantry.name
+                        {
+                            name: pantry.name,
+                            thumbnail: pantry.thumbnail
+                        }
                     })
                     .then(()=> {
                         console.log(`Pantry update complete`)

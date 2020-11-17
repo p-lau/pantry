@@ -70,7 +70,7 @@ function registerValidSW(swUrl: string, config?: Config, toast?: any) {
                             // At this point, the updated precached content has been fetched,
                             // but the previous service worker will still serve the older
                             // content until all client tabs are closed.
-                            toast.info(`New content is available and will be used when all tabs for this page are closed. See https://cra.link/PWA.`
+                            toast.info(`New content is available and will be used when all tabs for this page are closed.`
                             )
                             // Execute callback
                             if (config && config.onUpdate) config.onUpdate(registration)

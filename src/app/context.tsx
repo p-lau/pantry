@@ -1,6 +1,7 @@
 import React from 'react'
 import {Helmet} from "react-helmet"
 import firebase from "firebase/app"
+import {toast} from "react-toastify";
 
 const firebaseConfig = {
     apiKey: "AIzaSyAcgohnDO5fDzJgx36PUMmK8obNyxrP7aA",
@@ -20,7 +21,8 @@ type App = {
     storage?: firebase.storage.Storage
     database?: firebase.database.Database
     user?: firebase.User,
-    theme: string[]
+    theme: string[],
+    loading: boolean
 }
 
 
@@ -28,11 +30,11 @@ const theme = [
     "#04081f","#370617","#6a040f", "#9d0208", "#d00000", "#dc2f02", "#E85D04", "#F48C06", "#FAA307", "#FFBA08"
 ]
 
-const init = { theme }
+const init = { theme, loading: true }
 
 const PantryContext = React.createContext<App>(init)
 const AppContext = ({children}: any) =>{
-    const [{app, database, firestore, storage, auth, user, theme, google}, setApp] = React.useState<App>(init)
+    const [{app, database, firestore, storage, auth, user, theme, google, loading}, setApp] = React.useState<App>(init)
 
     const updateApp = (key: string, value: any) => {
         setApp(p => ({...p, [key]:value}))
@@ -42,22 +44,22 @@ const AppContext = ({children}: any) =>{
         updateApp("theme", theme)
     }
 
-    // Lazy-load firebase
     React.useEffect(() => {
-
         if(!app){
+            // Initiate app if it hasn't already
             updateApp("app", firebase.initializeApp(firebaseConfig))
         } else {
+            // Lazy load firebase modules
             import("firebase/auth")
                 .then(()=>{
                     updateApp("auth", firebase.auth())
                     firebase.auth().onAuthStateChanged((user)=>{
                         updateApp("user", user)
+                        updateApp("loading", false)
                     })
                     firebase.auth().useDeviceLanguage()
                     const googleProvider = new firebase.auth.GoogleAuthProvider().addScope("profile")
                     updateApp("google", googleProvider)
-
                 })
                 .catch(()=>{
                     console.error("Firebase Auth not loaded")
@@ -67,6 +69,8 @@ const AppContext = ({children}: any) =>{
                     updateApp("firestore", firebase.firestore())
                     firebase.firestore()
                         .enablePersistence({synchronizeTabs: true})
+                    firebase.firestore()
+                        .settings({ignoreUndefinedProperties: true})
                 })
                 .catch((e)=>{
                     console.info(e.message)
@@ -81,6 +85,21 @@ const AppContext = ({children}: any) =>{
             import("firebase/database")
                 .then(()=>{
                     updateApp("database", firebase.database())
+                    const connectedRef = firebase.database().ref('.info/connected')
+                    connectedRef.on("value", (s) => {
+                        if (s.val()) {
+                            toast.isActive("connectivity") ?
+                            toast.update("connectivity",{render: "Connected to the server"})
+                                :
+                            toast.dark("Connected", {toastId: "connectivity"})
+                        } else {
+                            toast.isActive("connectivity") ?
+                            toast.update("connectivity",{render: "Disconnected from the server"})
+                                :
+                            toast.dark("Disconnected", {toastId: "connectivity"})
+
+                        }
+                    })
                 })
                 .catch(()=>{
                     console.error("Firebase Realtime Database not loaded")
@@ -98,6 +117,7 @@ const AppContext = ({children}: any) =>{
         google,
         theme,
         user,
+        loading,
         setTheme
     }
 

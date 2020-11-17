@@ -12,8 +12,8 @@ import {ReactComponent as Pantry} from "../../assets/icons/pantry.svg"
 const Menu = () => {
     const history = useHistory()
     const location = useLocation()
-    const {theme, user, auth} = React.useContext(PantryContext)
-    const photoURL = auth?.currentUser?.photoURL
+    const {theme, user, loading} = React.useContext(PantryContext)
+    const photoURL = user?.photoURL
     const paths = [
         {location: "/profile", name: user?.uid ? "Profile" : "Login", src: <Profile/>, photoURL},
         {location: "/home", name: "Home", src: <Home/>},
@@ -25,20 +25,22 @@ const Menu = () => {
         {location: "/pantry/", name: "Pantry", src: <Pantry/>},
     ]
 
+    const navigation = (user ? authPaths : paths).map((path, index) => (
+        <li key={index} style={{backgroundColor: theme[index], color: theme[index]}}>
+            <Item
+                path={path}
+                isSelected={location.pathname.startsWith(path.location)}
+                GoTo={() => {
+                    history.push(path.location)
+                }}/>
+        </li>
+    ))
+
     return (
-            <header id={`header`} className={styles.header} style={{backgroundColor: theme.slice(-1)[0]}}>
+            <header id={`header`} className={styles.header} style={{backgroundColor: theme[0]}}>
                 <nav className={styles.nav}>
                     <ul className={styles.ul}>
-                        {(user?.uid ? authPaths : paths).map((path, index) => (
-                            <li key={index} style={{backgroundColor: theme[index]}}>
-                                <Item
-                                    path={path}
-                                    isSelected={location.pathname.startsWith(path.location)}
-                                    GoTo={() => {
-                                        history.push(path.location)
-                                    }}/>
-                            </li>
-                        ))}
+                        {loading ? null : navigation}
                     </ul>
                 </nav>
             </header>

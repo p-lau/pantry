@@ -19,16 +19,16 @@ type AvatarState = {
 }
 
 const Edit = () => {
-    const {user, firestore, auth, storage} = React.useContext(PantryContext)
+    const {user, firestore, auth, storage, loading} = React.useContext(PantryContext)
     const {userId}: any = useParams()
     const history = useHistory()
-    const uploadId = React.useRef<any>(null)
+    const toastId = React.useRef<any>()
 
     if(userId !== user?.uid){history.push(`/profile/${user}`)}
     const AvatarRef = storage?.ref(`profile/image`)
     const userRef = firestore?.doc(`/users/${user?.uid}`)
     const [{fileError, uploading, newAvatar, file, fileExt}, setState] = React.useState<AvatarState>({uploading: false})
-    const [value, loading, err] = useDocumentDataOnce(userRef)
+    const [value, docLoading, err] = useDocumentDataOnce(userRef)
 
     const filePreview = (e: any) => {
         const file = e.target.files[0] as File
@@ -45,71 +45,69 @@ const Edit = () => {
             reader.readAsDataURL(file)
         }
     }
+    const uploadAvatar = ({name, status, bio, username}: Partial<User>, file: File) => {
+        const fileRef = AvatarRef?.child(`${user?.uid}/avatar.${fileExt}`)
+        fileRef?.put(file).on('state_changed',
+            ({bytesTransferred, totalBytes}) => {
+                const progress = (bytesTransferred / totalBytes)
+                if(toastId.current === null){
+                    toastId.current = toast('Upload in Progress', {
+                        progress,
+                        type: "dark"
+                    });
+                } else {
+                    toast.update(toastId.current, {
+                        progress
+                    })
+                }
+            },
+            (e) => {
+                toast.update(toastId.current, {type: "error", render: e.message})
+            },
+            () => {
+                fileRef.updateMetadata({ cacheControl: "public,max-age=86400"})
+                    .then(()=>{console.info(`Metadata uploaded`)})
+                    .catch((e)=>{console.error(`Metadata update failed: ${e}`)})
+                toast.dismiss(toastId.current)
+                fileRef.getDownloadURL()
+                    .then((avatar) => {
+                        updateUser({name, status, avatar, bio, username})
+                    })
+                    .catch((e) => toast.error(e.message))
+            })
+    }
+    const updateUser = ({name, status, avatar, bio, username}: Partial<User>) => {
+        userRef?.update({name, status, avatar, bio, username})
+            .then(()=> {
+                auth?.currentUser?.updateProfile({photoURL: avatar, displayName: name})
+                toast.success(`Profile Uploaded`, {toastId: 'profile'})
+            })
+            .then(()=> {
+                setState(prevState => ({
+                    ...prevState,
+                    uploading: false
+                }))
+            })
+            .then(()=>{
+                history.push(`/profile`)
+            })
+            .catch(e => setState(prevState => ({...prevState, fileError: e})))
+    }
 
-    if(!user?.uid){history.push('/profile/login')}
+    if(!user && !loading){history.push('/profile/login')}
     if(err){return <Error e={err.name} m={err.message}/>}
-    if(loading){return <Loading/>}
+    if(loading || docLoading){return <Loading/>}
     else {
-        const {name, status, avatar} = value as User
+        const {name, status, username, bio, avatar} = value as User
         return (
             <>
                 <Helmet title={"Profile"}/>
-                <Formik initialStatus={false} initialValues={{name, status}} onSubmit={({name, status}) => {
+                <Formik initialStatus={false} initialValues={{name, status, username, bio}} onSubmit={({name, status, bio, username}) => {
                     setState(prevState => ({...prevState, uploading: true}))
                     if(fileExt && newAvatar && file){
-                        const fileRef = AvatarRef?.child(`${user?.uid}/avatar.${fileExt}`)
-                        fileRef?.put(file).on('state_changed',
-                            async ({bytesTransferred, totalBytes}) => {
-                                const progress = (bytesTransferred / totalBytes)
-                                if (uploadId.current === null) {
-                                    uploadId.current = toast.warning('Upload in progress...', {
-                                        progress,
-                                        autoClose: 5000
-                                    })
-                                } else {
-                                    toast.update(uploadId.current, {progress})
-                                }
-                            },
-                            (e) => {
-                                toast.update(uploadId.current, {type: "error"})
-                                toast.error(e.message)
-                            },
-                            () => {
-                                fileRef.updateMetadata({ cacheControl: "public,max-age=86400"})
-                                    .then((metadata)=>{console.info(`Metadata uploaded: ${metadata}`)})
-                                    .catch((e)=>{console.error(`Metadata update failed: ${e}`)})
-                                toast.update(uploadId.current, {type: "success"})
-                                fileRef.getDownloadURL()
-                                    .then((url: string) => {
-                                        toast.dismiss(uploadId.current)
-                                        uploadId.current = null
-                                        userRef?.update({name, status, avatar: url})
-                                            .then(()=> {
-                                                auth?.currentUser?.updateProfile({photoURL: url})
-                                                toast.success(`Profile Uploaded`, {toastId: 'profile'})
-                                            })
-                                            .then(()=> {
-                                                setState(prevState => ({
-                                                    ...prevState,
-                                                    uploading: false
-                                                }))
-                                            })
-                                            .then(()=>{
-                                                history.push(`/profile`)
-                                            })
-                                            .catch(e => setState(prevState => ({...prevState, fileError: e})))
-                                    })
-                                    .catch((e) => toast.error(e.message))
-
-                            })
+                        uploadAvatar({name, status, bio, username}, file)
                     } else {
-                        userRef?.update({name, status})
-                            .then(()=> {
-                                toast.success(`Profile Uploaded`, {toastId: 'profile'})
-                                setState(prevState => ({...prevState, uploading: false}))
-                                history.push(`/profile`)
-                            })
-                            .catch(e => setState(prevState => ({...prevState, fileError: e, uploading: false})))
+                        updateUser({name, status, bio, username})
                     }
                 }}>
                     {({values, setStatus, status})=>
@@ -139,7 +137,7 @@ const Edit = () => {
                                     }}
                                 />
                             </label>
-                            <label htmlFor={'name'} className={styles.profileLabel}>
+                            <label htmlFor={'name'} className={styles.name}>
                                 <small>Name:</small>
                                 <Field
                                     id={'name'}
@@ -152,7 +150,24 @@ const Edit = () => {
                                     size={30}
                                     required/>
                             </label>
-                            <label htmlFor={'status'} className={styles.profileLabel}>
+                            <label htmlFor={'username'} className={styles.username}>
+                                <small>Username:</small>
+                                <Field
+                                    id={'username'}
+                                    title={`Your username is ${values.username}`}
+                                    value={values.username || ""}
+                                    type={'text'}
+                                    autoComplete={"off"}
+                                    name={'username'}
+                                    placeholder={'Username'}
+                                    //TODO: Add function to record username
+                                    onBlur={()=>setStatus(true)}
+                                    maxLength={30}
+                                    size={30}
+                                    />
+                                <small>{}</small>
+                            </label>
+                            <label htmlFor={'status'} className={styles.status}>
                                 <small>Status:</small>
                                 <Field
                                     id={'status'}
@@ -162,7 +177,23 @@ const Edit = () => {
                                     name={'status'}
                                     placeholder={"Status"}
                                     onBlur={()=>setStatus(true)}
+                                    maxLength={30}
                                     size={30}/>
+                            </label>
+                            <label htmlFor={'bio'} className={styles.bio}>
+                                <small>Short Bio: {values.bio?.length || 0}/100</small>
+                                <Field
+                                    id={'bio'}
+                                    title={`Your short bio is ${values.bio || "empty."}`}
+                                    autoComplete={"off"}
+                                    component={'textarea'}
+                                    maxLength={100}
+                                    cols={30}
+                                    rows={4}
+                                    name={'bio'}
+                                    placeholder={"Your profile description"}
+                                    onBlur={()=>setStatus(true)}
+                                    />
                             </label>
                             <button className={uploading ? `btn disabled-btn` : `btn success-btn`} disabled={uploading} type={"submit"} onClick={()=>setStatus(false)}>Save profile</button>
                             <button className={`btn danger-btn`} type={"button"} onClick={()=>history.goBack()}>← Go Back</button>

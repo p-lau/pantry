@@ -63,3 +63,12 @@
 .avatar:hover .hover {
     opacity: 100%;
 }
+
+.pantries {
+    display: flex;
+}
+
+.pantries li {
+    list-style: none;
+
+}

@@ -273,7 +273,7 @@
             justify-content: center;
         }
         a {
-            color: dodgerblue;
+            color: inherit;
             background-color: transparent;
             text-decoration: none;
         }
@@ -380,7 +380,7 @@
         input[type=text],
         input[type=tel],
         input[type=select],
-        select {
+        select, textarea {
             cursor: pointer;
             background-color: #eee;
             font-family: Whitney-Medium, sans-serif;
@@ -408,6 +408,9 @@
             sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+        }
+        textarea {
+            resize: none;
         }
         form {
             display: flex;

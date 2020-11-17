@@ -20,20 +20,18 @@ const Error = ({e = "404", m = "Not Found"}: {e?: string, m?: string}) => {
 
 const Loading = () => {
     return (
-        <div className={'content waitingBlur'}>
-            <section className={'loading'}>
-                <Helmet title={'Loading...'}/>
-                <h1>Loading</h1>
-            </section>
-        </div>
+        <section className={'loading'}>
+            <Helmet title={'Loading...'}/>
+            <h1 className={'waitingBlur'}>Loading</h1>
+        </section>
     )
 }
 
 const Pages = () => {
     return(
         <main>
-            <React.Suspense fallback={<Loading/>}>
-                <div className={'content'}>
+            <div className={'content'}>
+                <React.Suspense fallback={<Loading/>}>
                     <Switch>
                         <Route exact path={"/"} render={()=><Redirect to={'/home'}/>}/>
                         <Route path={"/home"} component={Home}/>
@@ -43,8 +41,8 @@ const Pages = () => {
                         <Route path={"/profile"} component={Profile}/>
                         <Route path={"*"} component={Error}/>
                     </Switch>
-                </div>
-            </React.Suspense>
+                </React.Suspense>
+            </div>
         </main>
     )
 }

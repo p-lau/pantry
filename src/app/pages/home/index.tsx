@@ -1,11 +1,12 @@
-import React, {useContext} from "react"
+import React from "react"
 import {Link} from "react-router-dom"
 import {Helmet} from "react-helmet"
 import {PantryContext} from "../../context"
+import {Loading} from "../"
 
 const Home = () => {
-    const {user} = useContext(PantryContext)
-
+    const {user, database, loading} = React.useContext(PantryContext)
+    if(loading) return <Loading/>
     return (
         <>
             <Helmet title={"Welcome"}/>
@@ -15,6 +16,12 @@ const Home = () => {
                 is the app for you.</p>
             <p>List your food here with an expiration date, and we can notify you before the time runs out.</p>
             {!user?.uid && <Link to={'/profile/login'}>Click here to sign in</Link>}
+            <button className={'btn'} onClick={()=>{
+                database?.goOnline()
+            }}>Go Online</button>
+            <button className={'btn'} onClick={()=>{
+                database?.goOffline()
+            }}>Go Offline</button>
         </>
     );
 }

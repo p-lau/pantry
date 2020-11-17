@@ -1,13 +1,13 @@
-import firebase from "firebase";
-import Timestamp = firebase.firestore.Timestamp
+import firebase from "firebase/app"
 
 export interface PantryIngredient {
     name: string
     type?: string
-    expires?: Timestamp
+    expires?: firebase.firestore.Timestamp
 }
 
 export type Pantry = {
+    thumbnail?: string
     owner: string
     sharedWith?: string[]
     name: string

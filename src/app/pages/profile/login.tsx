@@ -8,7 +8,7 @@ import {Field, Form, Formik} from "formik"
 import {toast} from "react-toastify"
 
 export const GoogleLogin = () => {
-    const {auth, firestore, google} = React.useContext(PantryContext)
+    const { auth, firestore, google } = React.useContext(PantryContext)
     console.log(auth)
 
     return (
@@ -38,10 +38,9 @@ export const GoogleLogin = () => {
 }
 
 const Login = () => {
-    const {user, auth} = React.useContext(PantryContext)
+    const {user, auth, loading} = React.useContext(PantryContext)
     const [error, setError] = React.useState("")
-    if(user?.uid){return <Redirect to={'/home'}/>}
-
+    if(user && !loading){return <Redirect to={'/home'}/>}
     return (
         <>
             <Helmet title={"Login"}/>
